@@ -34,7 +34,7 @@ Here is what it looks like:
 
 ### SSH Config on the workstation
 
-```
+```bash
 JUMPBOX_HOSTNAME=1.2.3.4
 FINAL_HOST_ALIAS=10.*
 USER_FOR_FINAL_HOST=user
@@ -58,6 +58,7 @@ Host ${FINAL_HOST_ALIAS}
 #
 ##### Agent forwarding :: [Workstation ---> Jumpbox ---> Final Host] :: end
 
+EOF
 ```
 
 Update the following:
@@ -74,7 +75,7 @@ Make sure you're using an ssh agent to manage your keys. List them with `ssh-add
 
 For OSX make sure your keys are always loaded.
 
-```
+```bash
 cat <<EOF | sudo tee -a file > ~/.bash_profile > /dev/null
 
 # --- SSH AGENT ---
@@ -98,6 +99,7 @@ if [ ! -f /tmp/agent ];then
 
 fi
 eval $(< /tmp/agent) > /dev/null 2>&1
+
 EOF
 ```
 
