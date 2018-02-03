@@ -1,0 +1,35 @@
+- name: Check for local ssh tunnel on [WORKSTATION]
+  shell: |
+    ps x | grep ssh | grep '\-nNT -L {{ clone_tunnel_local }}' | grep -v grep
+  register: local_tunnel
+  ignore_errors: yes
+  tags:
+    - tunnel_local
+
+- name: Setup tunnel on [WORKSTATION], which sends (local:9000) -> (jumpbox:8000)
+  shell: |
+    ssh -nNT -L {{ clone_tunnel_local }} -i {{ key_tunnel_local }}
+  async: 1000
+  poll: 0
+  when: local_tunnel.stdout == ""
+  tags:
+    - tunnel_local
+
+- name: Check for tunnel on [JUMPBOX]
+  shell: |
+    ps x | grep ssh | grep '\-nNT -L {{ clone_tunnel_jump }}' | grep -v grep
+  delegate_to: "{{ delegated_jump_host }}"
+  register: jumpbox_tunnel
+  ignore_errors: yes
+  tags:
+    - tunnel_jump
+
+- name: Setup tunnel on [JUMPBOX], which sends (jumpbox:8000) -> (git:7999)
+  shell: |
+    ssh -nNT -L {{ clone_tunnel_jump }}  -i {{ key_tunnel_jump }}
+  async: 1000
+  poll: 0
+  delegate_to: "{{ delegated_jump_host }}"
+  when: jumpbox_tunnel.stdout == ""
+  tags:
+    - tunnel_jump

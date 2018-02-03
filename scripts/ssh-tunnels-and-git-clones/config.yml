@@ -1,0 +1,21 @@
+---
+# reference:
+# ---------
+# `workstation:(9000 -> 8000)` => `jumphost:(8000 -> 7999)` => `targethost:(7999)`
+
+# local tunnel info
+clone_tunnel_local: 9000:localhost:8000 jumphost
+key_tunnel_local: /home/user/.ssh/user
+delegated_jump_host: jumphost
+
+# jumpbox tunnel info
+clone_tunnel_jump: 8000:localhost:7999 drew@targethost
+key_tunnel_jump: /home/user/.ssh/user
+
+# info about the repos you want to clone
+clone_src_url: foo.com
+clone_tmp_clone_area: /tmp/cloned-data
+clone_key_for_git_access: /home/drew/.ssh/id_rsa_git_key
+origin_new: my_new_origin
+clone_list:
+  - { src_proj: "bar", src_repo_name: "bar" }

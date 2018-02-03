@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Andrew Khoury (drew.khouey@gmail.com)
+# Andrew Khoury (drew.khoury@gmail.com)
 
 echo "-------------------------------------------------------------------------"
 echo "Requirements: git"
@@ -42,4 +42,3 @@ for d in ${REPO_BASE_DIR}/*; do
     echo
   fi
 done
-

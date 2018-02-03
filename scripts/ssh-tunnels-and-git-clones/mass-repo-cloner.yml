@@ -1,0 +1,16 @@
+- hosts: "localhost"
+  gather_facts: False
+
+  tasks:
+
+    - include_vars:
+        file: config.yml
+      tags: always
+
+    - name: Check for existing ssh tunnels and create them if required.
+      include: tasks_ssh-tunnel.yml
+      tags: ssh_tunnels
+
+    - name: Clone repos from target to destination.
+      include: tasks_git-clone.yml
+      tags: git_clone

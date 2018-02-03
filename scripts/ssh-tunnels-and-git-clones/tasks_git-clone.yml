@@ -1,0 +1,73 @@
+
+- name: Clone repos from
+  git:
+    repo: ssh://git@{{ clone_src_url }}/{{ item.src_proj }}/{{ item.src_repo_name }}.git
+    dest: "{{ clone_tmp_clone_area }}/{{ item.src_repo_name }}"
+    accept_hostkey: true
+    key_file: "{{ clone_key_for_git_access }}"
+  with_items:
+    - "{{ clone_list }}"
+
+- name: Get ALL branches and tags from source origin
+  shell: |
+    "cd {{ clone_tmp_clone_area }}/{{ item.src_repo_name }}"
+    git config core.sshCommand 'ssh -i {{ clone_key_for_git_access }}'
+
+    # make sure we fetch all new branches and tags and things:
+    git fetch --all
+
+    # ::
+    # get all remotes,
+    # - filter-in for origin/,
+    # - filter-out for ->,
+    # - add local branch for each
+    #
+    # It should look something like this for new branches:
+    # git branch --track foo origin/foo
+    #
+    # It should look something like this for existing branches:
+    # git pull origin foo
+    #
+    git branch -r \
+    | grep origin//* \
+    | grep -v '\->' \
+    | while read remote;
+    do
+    if git branch | grep -q ${remote#origin/}; then
+      git pull origin ${remote#origin/}
+    else
+      git branch --track "${remote#origin/}" "$remote";
+    fi
+    done
+  args:
+    chdir: "{{ clone_tmp_clone_area }}/{{ item.src_repo_name }}"
+  with_items:
+    - "{{ clone_list }}"
+  tags:
+    - get_all_branches
+
+- name: Add origin_new Remote (ignore error 128 -> fatal remote origin_new already exists)
+  shell: |
+    git config core.sshCommand 'ssh -i /home/user/.ssh/id_rsa'
+    git remote add {{ origin_new }} ssh://git@{{ clone_dest_url }}/{{ item.dest_proj }}/{{ item.src_repo_name }}.git
+  args:
+    chdir: "{{ clone_tmp_clone_area }}/{{ item.src_repo_name }}"
+  with_items:
+  - "{{ clone_list }}"
+  register: add_remote
+  failed_when: "add_remote.rc != 0 and add_remote.rc != 128"
+  tags:
+    - add_origin_new_remote
+
+- name: Push all branches and tags to origin_new
+  shell: |
+    "cd {{ clone_tmp_clone_area }}/{{ item.src_repo_name }}"
+    git config core.sshCommand 'ssh -i /home/user/.ssh/id_rsa'
+    git push {{ origin_new }} --all
+    git push {{ origin_new }} --tags
+  args:
+    chdir: "{{ clone_tmp_clone_area }}/{{ item.src_repo_name }}"
+  with_items:
+    - "{{ clone_list }}"
+  tags:
+    - push_to_origin_new_remote
