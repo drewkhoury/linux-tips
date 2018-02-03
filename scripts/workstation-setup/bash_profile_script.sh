@@ -42,9 +42,12 @@ okta-auth () {
 }
 
 setup_git_config () {
+
+  alias g=git
+
   # Require setting user.name and email per-repo:
   git config --global user.useConfigOnly true
 
   # Remove email address from global config:
-  git config --global --unset-all user.email}
+  git config --global --unset-all user.email
 }
