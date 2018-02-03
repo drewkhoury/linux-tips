@@ -40,3 +40,11 @@ aws-env-unset () {
 okta-auth () {
   docker run -it xxx/okta-auth:latest
 }
+
+setup_git_config () {
+  # Require setting user.name and email per-repo:
+  git config --global user.useConfigOnly true
+
+  # Remove email address from global config:
+  git config --global --unset-all user.email}
+}
