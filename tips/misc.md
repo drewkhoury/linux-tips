@@ -6,6 +6,22 @@
 ps -ef | grep your_process_name | grep -v grep | awk '{print $2}' | xargs kill
 ```
 
+# Memory Management with Docker
+
+https://gist.github.com/BretFisher/5e1a0c7bcca4c735e716abf62afad389
+
+https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
+
+
+```
+screen ~/Library/Containers/com.docker.docker/Data/vms/0/tty
+
+cat /proc/sys/vm/max_map_count
+sysctl -w vm.max_map_count=262144
+
+
+```
+
 # Chrome
 
 More Tools > Task Manager > GPU Process
